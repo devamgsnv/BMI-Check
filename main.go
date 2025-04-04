@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
 )
@@ -11,7 +12,11 @@ func main() {
 	for {
 		fmt.Println("BMI-Check")
 		userWeight, userHeight := getUserInput()
-		IMT := calculateIMT(userWeight, userHeight)
+		IMT, err := calculateIMT(userWeight, userHeight)
+		if err != nil {
+			fmt.Println("No weight or height specified")
+			continue
+		}
 		outputResult(IMT)
 		isRepeatCalculation := checkRepeatCalculation()
 		if !isRepeatCalculation {
@@ -35,9 +40,12 @@ func outputResult(imt float64) {
 	}
 }
 
-func calculateIMT(userWeight float64, userHeight float64) float64 {
+func calculateIMT(userWeight float64, userHeight float64) (float64, error) {
+	if userWeight <= 0 || userHeight <= 0 {
+		return 0, errors.New("NO_PARAMS_ERROR")
+	}
 	IMT := userWeight / math.Pow(userHeight/100, IMTPower)
-	return IMT
+	return IMT, nil
 }
 
 func getUserInput() (float64, float64) {
